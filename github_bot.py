@@ -15,10 +15,10 @@ max_files = 100
 def get_github_docs(repo_owner, repo_name):
     command = f"git clone --depth 1 https://github.com/{repo_owner}/{repo_name}.git ."
 
-    with tempfile.TemporaryDirectory() as d:
+    with tempfile.TemporaryDirectory() as temporary:
         subprocess.check_call(
-            ,
-            cwd=d,
+            command,
+            cwd=temporary,
             shell=True,
         )
 
@@ -32,7 +32,7 @@ def get_github_docs(repo_owner, repo_name):
         markdown_files = list(repo_path.glob("*/*.py")) + list(
             repo_path.glob("*/*.py")
         )
-        
+
         for markdown_file in markdown_files:
             if max_files <= 0:
                 break
