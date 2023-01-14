@@ -5,6 +5,8 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores.faiss import FAISS
 import requests
+from langchain.prompts import PromptTemplate
+
 
 def get_wiki_data(title, first_paragraph_only):
     url = f"https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext=1&titles={title}"
@@ -37,7 +39,26 @@ for source in sources:
 search_index = FAISS.from_documents(source_chunks, OpenAIEmbeddings())
 
 
-chain = load_qa_with_sources_chain(OpenAI(temperature=0))
+
+
+
+
+template = """Given the following extracted parts of a long document and a question, create a final answer with references ("SOURCES"). 
+If you don't know the answer, just say that you don't know. Don't try to make up an answer.
+ALWAYS return a "SOURCES" part in your answer.
+Respond in Italian.
+
+QUESTION: {question}
+=========
+{summaries}
+=========
+FINAL ANSWER IN ITALIAN:"""
+PROMPT = PromptTemplate(template=template, input_variables=["summaries", "question"])
+
+
+
+
+chain = load_qa_with_sources_chain(OpenAI(temperature=0), prompt=PROMPT,  chain_type="stuff")
 
 def print_answer(question):
     print(
@@ -49,3 +70,6 @@ def print_answer(question):
             return_only_outputs=True,
         )["output_text"]
     )
+
+
+print_answer("does unix run same as linux?")
