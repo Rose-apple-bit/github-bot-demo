@@ -8,25 +8,31 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores.faiss import FAISS
 
 from langchain.docstore.document import Document
-
+# how many markdown
 max_files = 100
+# how many markdown
 
 def get_github_docs(repo_owner, repo_name):
+    command = f"git clone --depth 1 https://github.com/{repo_owner}/{repo_name}.git ."
+
     with tempfile.TemporaryDirectory() as d:
         subprocess.check_call(
-            f"git clone --depth 1 https://github.com/{repo_owner}/{repo_name}.git .",
+            ,
             cwd=d,
             shell=True,
         )
+
         git_sha = (
             subprocess.check_output("git rev-parse HEAD", shell=True, cwd=d)
             .decode("utf-8")
             .strip()
         )
+
         repo_path = pathlib.Path(d)
         markdown_files = list(repo_path.glob("*/*.py")) + list(
             repo_path.glob("*/*.py")
         )
+        
         for markdown_file in markdown_files:
             if max_files <= 0:
                 break
